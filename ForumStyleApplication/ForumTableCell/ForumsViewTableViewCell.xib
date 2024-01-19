@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22155" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina5_9" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22131"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="105" id="KGk-i7-Jjw" customClass="ForumsViewTableViewCell" customModule="InClass10" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="105"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="375" height="105"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="95W-JW-STN">
+                        <rect key="frame" x="16" y="9" width="308" height="24"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                        <color key="textColor" systemColor="systemPurpleColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Zly-FQ-L0H">
+                        <rect key="frame" x="329" y="70" width="30" height="30"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="30" id="Uby-r4-CnL"/>
+                            <constraint firstAttribute="width" constant="30" id="oez-LJ-Jc1"/>
+                        </constraints>
+                        <state key="normal" title="Button" image="like_favorite"/>
+                        <connections>
+                            <action selector="likePost:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="ewz-XV-QEh"/>
+                        </connections>
+                    </button>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ztf-es-ZJz">
+                        <rect key="frame" x="332" y="10" width="30" height="30"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="30" id="X8m-bu-5rq"/>
+                            <constraint firstAttribute="width" constant="30" id="ed7-k0-3xd"/>
+                        </constraints>
+                        <state key="normal" image="trash.fill" catalog="system"/>
+                        <connections>
+                            <action selector="deleteButton:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="xvs-ms-Jwx"/>
+                        </connections>
+                    </button>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Text" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dL6-uV-xiv">
+                        <rect key="frame" x="16" y="44" width="343" height="17"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Likes" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Yz-7o-B86">
+                        <rect key="frame" x="16.000000000000004" y="70" width="39.333333333333343" height="18"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                        <color key="textColor" systemColor="systemPurpleColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="dL6-uV-xiv" firstAttribute="top" secondItem="95W-JW-STN" secondAttribute="bottom" constant="11" id="0Zd-sl-el3"/>
+                    <constraint firstItem="0Yz-7o-B86" firstAttribute="firstBaseline" secondItem="dL6-uV-xiv" secondAttribute="baseline" constant="26.999999999999993" id="53j-PD-Ltp"/>
+                    <constraint firstAttribute="trailing" secondItem="Zly-FQ-L0H" secondAttribute="trailing" constant="16" id="B94-Dr-qe3"/>
+                    <constraint firstItem="95W-JW-STN" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="9" id="JqQ-PD-OYs"/>
+                    <constraint firstAttribute="trailing" secondItem="ztf-es-ZJz" secondAttribute="trailing" constant="13" id="RMo-MX-Yxr"/>
+                    <constraint firstAttribute="bottom" secondItem="Zly-FQ-L0H" secondAttribute="bottom" constant="5" id="TdF-8c-9O5"/>
+                    <constraint firstItem="ztf-es-ZJz" firstAttribute="leading" secondItem="95W-JW-STN" secondAttribute="trailing" constant="8" id="U8j-Xo-P57"/>
+                    <constraint firstItem="ztf-es-ZJz" firstAttribute="leading" secondItem="95W-JW-STN" secondAttribute="trailing" constant="8" id="X3P-U6-pbf"/>
+                    <constraint firstItem="Zly-FQ-L0H" firstAttribute="leading" secondItem="0Yz-7o-B86" secondAttribute="trailing" constant="273.66666666666663" id="ebI-e4-Yku"/>
+                    <constraint firstItem="ztf-es-ZJz" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="fNy-01-B4t"/>
+                    <constraint firstItem="dL6-uV-xiv" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="fs4-ft-hZO"/>
+                    <constraint firstItem="Zly-FQ-L0H" firstAttribute="top" secondItem="dL6-uV-xiv" secondAttribute="bottom" constant="9" id="lZz-Gd-ygz"/>
+                    <constraint firstItem="0Yz-7o-B86" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="nsg-jl-p3T"/>
+                    <constraint firstAttribute="trailing" secondItem="dL6-uV-xiv" secondAttribute="trailing" constant="16" id="pM3-ye-MpS"/>
+                    <constraint firstItem="95W-JW-STN" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="wuY-Ct-aUW"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <connections>
+                <outlet property="contentLabel" destination="dL6-uV-xiv" id="CIN-q9-Uux"/>
+                <outlet property="deleteButtonOutlet" destination="ztf-es-ZJz" id="5Mg-0J-iRs"/>
+                <outlet property="likeButtonOutlet" destination="Zly-FQ-L0H" id="n0v-kf-phh"/>
+                <outlet property="likeLabel" destination="0Yz-7o-B86" id="izn-sk-d8f"/>
+                <outlet property="nameLabel" destination="95W-JW-STN" id="zSa-F7-QaG"/>
+            </connections>
+            <point key="canvasLocation" x="138.40000000000001" y="147.41379310344828"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="like_favorite" width="512" height="512"/>
+        <image name="trash.fill" catalog="system" width="117" height="128"/>
+        <systemColor name="systemPurpleColor">
+            <color red="0.68627450980000004" green="0.32156862749999998" blue="0.87058823529999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>

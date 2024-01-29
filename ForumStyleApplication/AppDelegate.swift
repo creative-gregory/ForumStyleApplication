@@ -20,6 +20,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         FirebaseApp.configure()
 //        UserDefaults.standard.set(false, forKey: "_UIConstraintBasedLayoutLogUnsatisfiable") // remove once done
+        
+//        isUserSignedIn { signInState in
+//            switch signInState {
+//            case .loaded:
+//                self.window = UIWindow(frame: UIScreen.main.bounds)
+//
+//                let storyboard = UIStoryboard(name: "Main", bundle: nil)
+//                
+//                let initialViewController = storyboard.instantiateViewController(withIdentifier: "LoginSignupVC")
+//
+//                self.window?.rootViewController = initialViewController
+//                self.window?.makeKeyAndVisible()
+//            default:
+//                
+//            }
+//        }
+        
         return true
     }
 

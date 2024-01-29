@@ -39,6 +39,20 @@ enum UserState {
     case failed(String)
 }
 
+enum PostState {
+    case awaitingPost
+    case posting
+    case posted
+    case failed
+}
+
+enum VerifyIDState {
+    case idle
+    case awaiting
+    case exists
+    case absent
+}
+
 struct Post {
     var id: String
     var uid: String
@@ -62,6 +76,7 @@ struct Comment {
     var date: String
     var comment: String
 }
+
 
 // Test Source Control
 

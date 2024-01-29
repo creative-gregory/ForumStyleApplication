@@ -16,7 +16,33 @@ class ForumTableViewController: UITableViewController {
     var activityIndicator: UIActivityIndicatorView = UIActivityIndicatorView()
     var postToSend:Post!
     var currentUser:User!
-    var posts = [Post]()
+    private lazy var posts = [Post]()
+    
+    @IBOutlet weak var sortPostsButton: UIBarButtonItem!
+    
+    func sortHandler() {
+        
+        let menuHandler: UIActionHandler = { action in
+            print(action.title)
+        }
+        
+        let barButtonMenu = UIMenu(title: "", children: [
+            UIAction(title: NSLocalizedString("Most Popular", comment: ""), image: UIImage(systemName: "viewfinder"), handler: menuHandler),
+            UIAction(title: NSLocalizedString("Newest to Oldest", comment: ""), image: UIImage(systemName: "books.vertical"), handler: menuHandler),
+            UIAction(title: NSLocalizedString("Oldest to Newest", comment: ""), image: UIImage(systemName: "bell"), handler: menuHandler),
+            UIAction(title: NSLocalizedString("Alphabetical", comment: ""), image: UIImage(systemName: "trash"), handler: menuHandler)
+        ])
+        
+        let  btn = UIBarButtonItem(title: "Sort By", style: .plain, target: self, action: nil)
+        
+        //        navigationItem.leftBarButtonItem?.menu = barButtonMenu
+        
+        navigationItem.leftBarButtonItems?[1] = (btn)
+        //        sortPostsButton.showsMenuAsPrimaryAction = true
+        //        btn.menu = barButtonMenu
+        // or using the initializer
+        navigationItem.leftBarButtonItems?.append(UIBarButtonItem(title: "Manage", image: nil, primaryAction: nil, menu: barButtonMenu))
+    }
     
     @IBAction func refreshControl(_ sender: UIRefreshControl) {
         FirebaseDatabaseService.shared.retrievePosts { state in
@@ -41,16 +67,17 @@ class ForumTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.refreshControl?.attributedTitle = NSAttributedString(string: "Getting New Posts...")
+        //        sortHandler()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         let cellNib = UINib(nibName: "ForumsViewTableViewCell", bundle: nil)
         tableView.register(cellNib, forCellReuseIdentifier: "ForumsPage")
         
-//        tableView.estimatedRowHeight = 100
-//        tableView.rowHeight = UITableView.automaticDimension
-        
         initActivityMonitor(activityIndicator: activityIndicator, view: self.view)
+        
         
         FirebaseDatabaseService.shared.retrievePosts { state in
             switch state {
@@ -70,6 +97,9 @@ class ForumTableViewController: UITableViewController {
             }
         }
         
+        
+        
+        
     }
     
     @IBAction func newPostButton(_ sender: Any) {
@@ -77,7 +107,7 @@ class ForumTableViewController: UITableViewController {
     }
     
     @IBAction func logOutButton(_ sender: Any) {
-//        NotificationCenter.default.post(name: Notification.Name("LogOut"), object: nil)
+        //        NotificationCenter.default.post(name: Notification.Name("LogOut"), object: nil)
         logOutUser { state in
             switch state {
             case .awaiting:
@@ -109,7 +139,7 @@ class ForumTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ForumsPage", for: indexPath) as! ForumsViewTableViewCell
         let currentPost = posts[indexPath.row]
-                
+        
         cell.delegate = self as PostCellDelegate
         
         cell.nameLabel.text = currentPost.username
@@ -153,31 +183,31 @@ class ForumTableViewController: UITableViewController {
         postToSend = posts[indexPath.row]
         
         FirebaseDatabaseService.shared.verifyPost(postID: postToSend.id) { verifyState in
-                    switch verifyState {
-                    case .present:
-                        self.performSegue(withIdentifier: "PostView", sender: self)
-//                        tableView.deselectRow(at: indexPath, animated: true)
-                        
-                    case .absent:
-                        print("Post does not exist")
-                        
-                        let alert = displayAlert(title: "Error", message: "Post does not exist, please refresh your feed.")
-                        self.present(alert, animated: true, completion: nil)
-                        
-                    case .failed(let error):
-                        let alert = displayAlert(title: "Error", message: error)
-                        self.present(alert, animated: true, completion: nil)
-                    }
-                }
+            switch verifyState {
+            case .present:
+                self.performSegue(withIdentifier: "PostView", sender: self)
+                //                        tableView.deselectRow(at: indexPath, animated: true)
+                
+            case .absent:
+                print("Post does not exist")
+                
+                let alert = displayAlert(title: "Error", message: "Post does not exist, please refresh your feed.")
+                self.present(alert, animated: true, completion: nil)
+                
+            case .failed(let error):
+                let alert = displayAlert(title: "Error", message: error)
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
         
         tableView.deselectRow(at: indexPath, animated: true)
-
+        
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-//        return CGFloat(Double(posts[indexPath.row].content.count) * 0.5)
+        //        return CGFloat(Double(posts[indexPath.row].content.count) * 0.5)
         return UITableView.automaticDimension
-     }
+    }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "PostView" {
@@ -238,10 +268,10 @@ extension ForumTableViewController: PostCellDelegate {
         FirebaseDatabaseService.shared.likeHandler(postID: post.id) {
             state in
             switch state {
-//            case .awaiting:
-//                print("awaiting")
-//            case .loading:
-//                print("loading")
+                //            case .awaiting:
+                //                print("awaiting")
+                //            case .loading:
+                //                print("loading")
             case .loaded:
                 self.handleLocalLikes(index: indexPath.row)
                 self.tableView.reloadData()
@@ -273,7 +303,9 @@ extension ForumTableViewController: PostCellDelegate {
             self.posts[index].likes![currentUser.uid] = liker
         }
         
-//        print(self.posts[indexPath.row])
+        //        print(self.posts[indexPath.row])
     }
+    
+    
     
 }

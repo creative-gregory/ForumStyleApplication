@@ -58,43 +58,46 @@ class FirebaseDatabaseService {
         print("Retrieving Posts")
         state(.awaiting)
         
-        self.ref.child("Posts").observeSingleEvent(of: .value, with: { (snapshot) in
+        DispatchQueue.main.async {
             state(.loading)
-            var posts = [Post]()
             
-            if snapshot.exists() {
-                guard let postyArray = snapshot.value as? [String:[String:Any]] else { return }
+            self.ref.child("Posts").observeSingleEvent(of: .value, with: { (snapshot) in
+                var posts = [Post]()
                 
-                for (postID, postData) in postyArray {
-                    var newPost: Post
+                if snapshot.exists() {
+                    guard let postyArray = snapshot.value as? [String:[String:Any]] else { return }
                     
-                    guard let uid = postData["uid"] as? String else { print("whoopsie uid"); return }
-                    guard let username = postData["username"] as? String else { print("whoopsie username \(postID)"); return }
-                    guard let content = postData["content"] as? String else { print("whoopsie content"); return }
-                    guard let date = postData["date"] as? String else { print("whoopsie date"); return }
-                    
-                    if postData.keys.contains("likes") {
-                        guard let likes = postData["likes"] as? [String:Any], !likes.isEmpty else { print("whoopsie likes"); return }
-                        newPost = Post(id: postID, uid: uid, username: username, date: date, content: content, likes: likes)
+                    for (postID, postData) in postyArray {
+                        var newPost: Post
+                        
+                        guard let uid = postData["uid"] as? String else { print("Error with uid"); return }
+                        guard let username = postData["username"] as? String else { print("Error with username \(postID)"); return }
+                        guard let content = postData["content"] as? String else { print("Error with content"); return }
+                        guard let date = postData["date"] as? String else { print("Error with date"); return }
+                        
+                        if postData.keys.contains("likes") {
+                            guard let likes = postData["likes"] as? [String:Any], !likes.isEmpty else { print("Error with likes"); return }
+                            newPost = Post(id: postID, uid: uid, username: username, date: date, content: content, likes: likes)
+                        }
+                        else {
+                            newPost = Post(id: postID, uid: uid, username: username, date: date, content: content, likes: [:])
+                        }
+                        
+                        posts.append(newPost)
                     }
-                    else {
-                        newPost = Post(id: postID, uid: uid, username: username, date: date, content: content, likes: [:])
-                    }
                     
-                    posts.append(newPost)
+                    posts.sort(by: { $0.date > $1.date })
+                    state(.loaded(posts))
                 }
-                
-                posts.sort(by: { $0.date > $1.date })
-                state(.loaded(posts))
-            }
-            else {
-                print("No Posts Available")
-                let newPost = Post(id: "", uid: "", username: "", date: "", content: "No posts yet, be the first!")
-                posts.append(newPost)
-                
-                state(.loaded(posts))
-            }
-        })
+                else {
+                    print("No Posts Available")
+                    let newPost = Post(id: "", uid: "", username: "", date: "", content: "No posts yet, be the first!")
+                    posts.append(newPost)
+                    
+                    state(.loaded(posts))
+                }
+            })
+        }
     }
     
     // Like Handler
@@ -102,33 +105,48 @@ class FirebaseDatabaseService {
         guard let currentUser = Auth.auth().currentUser else { return }
         state(.awaiting)
         
-        self.verifyPost(postID: postID) { verifyState in
-            switch verifyState {
-            case .present:
-                self.ref.child("Posts").child(postID).child("likes").observeSingleEvent(of: .value) { (snapshot, error) in
-                    state(.loading)
-                    if snapshot.exists() {
-                        // Case 1: More than one user has liked the post
-                        // Action A: If the user already liked the post, remove it
-                        // Action B: If the user has not liked the post, append it
-                        guard let like = snapshot.value as? [String:Any] else { return }
-                        
-                        // Action A: The user has already like, Remove
-                        if like.keys.contains(currentUser.uid) {
-                            self.removeLike(postID: postID) { likeState in
-                                switch likeState {
-                                case true:
-                                    print("\(currentUser.uid) has liked removed")
-                                    state(.loaded)
-                                case false:
-                                    print("Awaiting")
+        DispatchQueue.main.async {
+            self.verifyPost(postID: postID) { verifyState in
+                switch verifyState {
+                case .present:
+                    self.ref.child("Posts").child(postID).child("likes").observeSingleEvent(of: .value) { (snapshot, error) in
+                        state(.loading)
+                        if snapshot.exists() {
+                            // Case 1: More than one user has liked the post
+                            // Action A: If the user already liked the post, remove it
+                            // Action B: If the user has not liked the post, append it
+                            guard let like = snapshot.value as? [String:Any] else { return }
+                            
+                            // Action A: The user has already like, Remove
+                            if like.keys.contains(currentUser.uid) {
+                                self.removeLike(postID: postID) { likeState in
+                                    switch likeState {
+                                    case true:
+                                        print("\(currentUser.uid) has liked removed")
+                                        state(.loaded)
+                                    case false:
+                                        print("Awaiting")
+                                    }
+                                }
+                                
+                                // Add exception handling for if the like cannot be removed, like a retry
+                            }
+                            else {
+                                // Action B: The user has not like, Append
+                                self.appendLike(postID: postID) { likeState in
+                                    switch likeState {
+                                    case true:
+                                        print("\(currentUser.uid) has liked appended")
+                                        state(.loaded)
+                                    case false:
+                                        print("Awaiting")
+                                    }
                                 }
                             }
-                            
-                            // Add exception handling for if the like cannot be removed, like a retry
                         }
+                        
                         else {
-                            // Action B: The user has not like, Append
+                            // Case 2: No users have like the post and this will be the initial liker - Action Append New Like
                             self.appendLike(postID: postID) { likeState in
                                 switch likeState {
                                 case true:
@@ -141,25 +159,12 @@ class FirebaseDatabaseService {
                         }
                     }
                     
-                    else {
-                        // Case 2: No users have like the post and this will be the initial liker - Action Append New Like
-                        self.appendLike(postID: postID) { likeState in
-                            switch likeState {
-                            case true:
-                                print("\(currentUser.uid) has liked appended")
-                                state(.loaded)
-                            case false:
-                                print("Awaiting")
-                            }
-                        }
-                    }
+                case .absent:
+                    state(.failed("Post not longer exists."))
+                    
+                case .failed(let error):
+                    state(.failed(error))
                 }
-                
-            case .absent:
-                state(.failed("Post not longer exists."))
-                
-            case .failed(let error):
-                state(.failed(error))
             }
         }
     }
@@ -212,35 +217,50 @@ class FirebaseDatabaseService {
     
     // Appends a new comment to the PostID supplied
     func postComment(postID: String, commentString: String, state: @escaping (_ state: LoadingState) -> Void) {
+        let commentID = generatePostID()
+        print(commentID)
         guard let currentUser = Auth.auth().currentUser else { return }
         state(.awaiting)
         
-        self.verifyPost(postID: postID) { verifyState in
-            switch verifyState {
+        self.verifyPost(postID: postID) { verifyPostID in
+            switch verifyPostID {
             case .present:
                 print("Processing Comment")
                 
-                let comment = [
-                    "uid": currentUser.uid,
-                    "name": currentUser.displayName,
-                    "date": getDate(),
-                    "comment": commentString
-                ]
-                
-                
-                self.ref.child("Posts").child(postID).child("comments").childByAutoId().setValue(comment) { (error, ref) -> Void in
-                    state(.loading)
-                    
-                    if error != nil {
-                        if let error = error {
-                            print(error.localizedDescription)
-                            state(.failed("Issue Posting Comment"))
+                self.verifyCommentID(postID: postID, commentID: commentID) { verifyCommentID in
+                    switch verifyCommentID {
+                    case .absent:
+                        
+                        let comment = [
+                            "uid": currentUser.uid,
+                            "name": currentUser.displayName,
+                            "date": getDate(),
+                            "comment": commentString
+                        ]
+                        
+                        
+                        self.ref.child("Posts").child(postID).child("comments").child(commentID).setValue(comment) { (error, ref) -> Void in
+                            state(.loading)
+                            
+                            if error != nil {
+                                if let error = error {
+                                    print(error.localizedDescription)
+                                    state(.failed("Issue Posting Comment"))
+                                }
+                            }
+                            else {
+                                state(.loaded)
+                            }
                         }
-                    }
-                    else {
-                        state(.loaded)
+                        
+                    case .exists:
+                        print("Comment ID Already Exists - Retry")
+                    default:
+                        break
                     }
                 }
+                
+                
                 
             case .absent:
                 print("Post does not exist")
@@ -255,10 +275,28 @@ class FirebaseDatabaseService {
     }
     
     // Verifies if a post is in the database for interactions
-    func verifyPostID(id: String, verifyState: @escaping (_ done: VerifyIDState) -> Void) {
+    func verifyPostID(id: String, verifyState: @escaping (_ postState: VerifyIDState) -> Void) {
         verifyState(.idle)
         
         self.ref.child("Posts").child(id).observeSingleEvent(of: .value) { (snapshot) in
+            verifyState(.awaiting)
+            
+            if snapshot.exists() {
+                print("Post ID Exists")
+                verifyState(.exists)
+            }
+            else {
+                print("Post ID Absent")
+                verifyState(.absent)
+            }
+        }
+    }
+    
+    // Verifies if a post is in the database for interactions
+    func verifyCommentID(postID: String, commentID: String, verifyState: @escaping (_ done: VerifyIDState) -> Void) {
+        verifyState(.idle)
+        
+        self.ref.child("Posts").child(postID).child("comments").child(commentID).observeSingleEvent(of: .value) { (snapshot) in
             verifyState(.awaiting)
             
             if snapshot.exists() {
@@ -383,7 +421,7 @@ class FirebaseDatabaseService {
         guard let currentUser = Auth.auth().currentUser else { return }
         let usernameData = [currentUser.uid: currentUser.email]
         
-        self.ref.child("Users").child(username).setValue(usernameData) { (error, ref) in
+        self.ref.child("Users").child(username.lowercased()).setValue(usernameData) { (error, ref) in
             if error != nil {
                 print("Failure: Username Not Set")
                 verifyName(.failed("Failure: Username Not Set"))

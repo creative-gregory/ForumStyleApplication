@@ -40,7 +40,7 @@ class SignUpViewController: UIViewController {
             return
         }
         
-        guard let name = nameTextField.text, !name.isEmpty else {
+        guard let name = nameTextField.text, !name.isEmpty, name.count <= 16 else {
             let alert = displayAlert(title: "Error", message: "Please Enter a Valid Name.")
             self.present(alert, animated: true)
             return

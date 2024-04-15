@@ -21,6 +21,7 @@ This is an application where users can post the imaginative ideas and interact w
 - NoSQL Databases
   - Asynchronus Database Data Handling
   - Database Data Parsing
+- User Interactions
 
 ## Technologies Used
 - UIKit
@@ -28,17 +29,8 @@ This is an application where users can post the imaginative ideas and interact w
 - Google Firebase Realtime Database
 
 ## Application Demo
-### Video Demo
+https://github.com/creative-gregory/ForumStyleApplication/assets/66806458/5d7b87d3-24d8-4aec-8843-1ca489e3988c
 
-### Login Page
-
-### Sign Up Page
-
-### Forum Posts Table Page
-
-### Forum Post Details Page
-
-### Add New Forum Post Page
 
 
 
